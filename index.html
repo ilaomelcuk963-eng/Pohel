@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>СЮРПРИЗ, МУДАК!</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none; /* Чтобы нельзя было выделить матюки */
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Comic Neue', 'Comic Sans MS', 'Chalkboard SE', cursive, sans-serif;
+            transition: all 0.6s cubic-bezier(0.34, 1.2, 0.64, 1);
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* ---- МИЛЫЙ РЕЖИМ (ФЕМБОЙ-ФУРРИ) ---- */
+        .cute-mode {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 50%, #fad0c4 100%);
+            box-shadow: inset 0 0 150px rgba(255, 200, 220, 0.8);
+        }
+
+        /* ---- ЕБАНЫЙ РЕЖИМ (РАЗРЫВ ОЧКА) ---- */
+        .hell-mode {
+            background: #000000;
+            box-shadow: inset 0 0 0 0;
+        }
+
+        /* Контейнер с милотой */
+        .cute-container {
+            text-align: center;
+            max-width: 500px;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 60px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+            border: 2px solid #fff;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: #c44569;
+            text-shadow: 2px 2px 0 #f8c6d1;
+            margin-bottom: 15px;
+        }
+
+        .fluffy {
+            font-size: 4rem;
+            letter-spacing: 10px;
+            filter: drop-shadow(0 0 5px #ff6b81);
+            margin: 20px 0;
+        }
+
+        .gift-btn {
+            background: linear-gradient(45deg, #fc5c7d, #6a82fb);
+            border: none;
+            padding: 18px 40px;
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: white;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            transition: transform 0.2s, box-shadow 0.2s;
+            font-family: inherit;
+            margin-top: 20px;
+        }
+
+        .gift-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 25px rgba(0,0,0,0.3);
+        }
+
+        /* Адская панель (Изначально скрыта и сломана) */
+        .hell-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: #000;
+            z-index: 200;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s ease, visibility 0s linear 0.3s;
+            text-align: center;
+            backdrop-filter: blur(4px);
+            gap: 30px;
+        }
+
+        .hell-container.active {
+            opacity: 1;
+            visibility: visible;
+            transition: opacity 0.01s ease;
+        }
+
+        .insult-text {
+            font-family: 'Impact', 'Arial Black', monospace;
+            font-size: 6rem;
+            letter-spacing: 8px;
+            text-transform: uppercase;
+            color: #ff0055;
+            text-shadow: 5px 5px 0px #550000, 10px 10px 0px #220000;
+            display: inline-block;
+            animation: ripAss 0.2s infinite alternate, shakeText 0.05s infinite;
+            transform-origin: center;
+            white-space: nowrap;
+        }
+
+        /* АНИМАЦИЯ "РАЗРЫВ ОЧКА" — деформация и дрожание экрана */
+        @keyframes ripAss {
+            0% { transform: scale(1) rotate(0deg); text-shadow: 2px 2px 0px red; }
+            100% { transform: scale(1.1) rotate(2deg) skew(5deg); text-shadow: -2px -2px 0px yellow; }
+        }
+
+        @keyframes shakeText {
+            0% { transform: translate(1px, 1px); }
+            25% { transform: translate(-2px, -1px); }
+            50% { transform: translate(2px, -2px); }
+            75% { transform: translate(-1px, 1px); }
+            100% { transform: translate(1px, -1px); }
+        }
+
+        /* Эффект разрыва на боди */
+        .hell-mode-active {
+            animation: screenTear 0.08s infinite alternate !important;
+        }
+
+        @keyframes screenTear {
+            0% { transform: skew(0deg, 0deg); filter: hue-rotate(0deg);}
+            25% { transform: skew(3deg, 1deg); filter: hue-rotate(15deg);}
+            50% { transform: skew(-2deg, -1deg); filter: hue-rotate(30deg);}
+            75% { transform: skew(1deg, 2deg); filter: hue-rotate(45deg);}
+            100% { transform: skew(0deg, 0deg); filter: hue-rotate(0deg);}
+        }
+
+        /* Мелкие элементы для уничтожения */
+        .glitch-bg {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(0deg, rgba(255,0,0,0.2) 0px, rgba(255,0,0,0.2) 2px, transparent 2px, transparent 8px);
+            pointer-events: none;
+            z-index: 250;
+            mix-blend-mode: multiply;
+        }
+
+        /* Скрываем милое, когда наступает ад */
+        .hide-cute {
+            display: none !important;
+        }
+
+        /* Мобильная адаптация */
+        @media (max-width: 600px) {
+            .insult-text { font-size: 2.5rem; white-space: normal; word-break: break-word; width: 90%;}
+            .cute-container { margin: 20px; width: 85%;}
+        }
+    </style>
+</head>
+<body class="cute-mode" id="mainBody">
+
+    <!-- Милый блок (Фурри-фембой) -->
+    <div id="cuteBlock" class="cute-container">
+        <div class="fluffy">
+            🐾✨🦊💖🐺✨🦄
+        </div>
+        <h1>Привет, сладкий! 🍰</h1>
+        <p style="font-size: 1.3rem; color:#3b2b2b;">Я приготовил для тебя кое-что особенное...<br> Нажми на кнопку и получи свой подарок 💝</p>
+        <div class="fluffy">
+            🎀🌈🐱🌸🍬🌸🐱🌈🎀
+        </div>
+        <button id="giftButton" class="gift-btn">🎁 ПОЛУЧИТЬ ПОДАРОК 🎁</button>
+        <p style="margin-top: 20px; font-size: 0.8rem; opacity: 0.7;">Обещаю, ты будешь в восторге... (￢‿￢)</p>
+    </div>
+
+    <!-- Адский блок (Разрыв очка) -->
+    <div id="hellBlock" class="hell-container">
+        <div class="glitch-bg"></div>
+        <div class="insult-text">
+            ПОШЁЛ НАХУЙ! 🖕<br>
+            ПОШЁЛ НАХУЙ! 🖕<br>
+            ПОШЁЛ НАХУЙ! 🖕<br>
+        </div>
+        <div class="insult-text" style="font-size: 3rem; animation: ripAss 0.15s infinite, shakeText 0.02s linear infinite;">
+            🔥 ТЫ ПОПАЛ, МУДАК 🔥
+        </div>
+        <div style="font-family: monospace; color: #ff7777; font-size: 2rem; margin-top: 20px;">➡️ РАЗРЫВ ОЧКА ЗАСЧИТАН ⬅️</div>
+    </div>
+
+    <script>
+        (function() {
+            const cuteDiv = document.getElementById('cuteBlock');
+            const hellDiv = document.getElementById('hellBlock');
+            const bodyEl = document.getElementById('mainBody');
+            const btn = document.getElementById('giftButton');
+
+            // Функция для вибрации (если поддерживается)
+            function vibrateASS() {
+                if (navigator.vibrate) {
+                    navigator.vibrate([200, 100, 200, 100, 500, 200, 500, 200, 1000]);
+                }
+            }
+
+            // Создаем вспомогательные элементы для "рвущегося" эффекта
+            function addRippingEffect() {
+                // Удаляем старые эффекты, если есть
+                const old = document.querySelector('.extra-ripper');
+                if(old) old.remove();
+
+                const ripperDiv = document.createElement('div');
+                ripperDiv.className = 'extra-ripper';
+                ripperDiv.style.position = 'fixed';
+                ripperDiv.style.top = '0';
+                ripperDiv.style.left = '0';
+                ripperDiv.style.width = '100%';
+                ripperDiv.style.height = '100%';
+                ripperDiv.style.pointerEvents = 'none';
+                ripperDiv.style.zIndex = '1000';
+                ripperDiv.style.background = 'url(\'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path fill="red" d="M10,10 L90,10 L50,90 Z" opacity="0.3"/><path fill="black" d="M20,80 L80,20 L95,95 Z" opacity="0.4"/></svg>\') repeat';
+                ripperDiv.style.backgroundSize = '30px 30px';
+                ripperDiv.style.mixBlendMode = 'overlay';
+                ripperDiv.style.animation = 'screenTear 0.05s infinite alternate';
+                document.body.appendChild(ripperDiv);
+                
+                // Удалить через 5 секунд, но ад останется
+                setTimeout(() => { if(ripperDiv) ripperDiv.style.opacity = '0'; setTimeout(() => { if(ripperDiv) ripperDiv.remove(); }, 1000); }, 5000);
+            }
+
+            // Основная функция "разрыва"
+            function unleashHell() {
+                if (!hellDiv || !cuteDiv) return;
+
+                // 1. Вибрация
+                vibrateASS();
+
+                // 2. Меняем классы
+                bodyEl.classList.remove('cute-mode');
+                bodyEl.classList.add('hell-mode');
+                bodyEl.classList.add('hell-mode-active'); // анимация экрана
+
+                // 3. Прячем милоту
+                cuteDiv.classList.add('hide-cute');
+                
+                // 4. Показываем ад
+                hellDiv.classList.add('active');
+                
+                // 5. Дополнительные эффекты разрыва
+                addRippingEffect();
+                
+                // 6. Каждые 200 мс дергаем текст для пущего эффекта
+                const insults = document.querySelectorAll('.insult-text');
+                let interval = setInterval(() => {
+                    if (!hellDiv.classList.contains('active')) {
+                        clearInterval(interval);
+                        return;
+                    }
+                    insults.forEach(el => {
+                        el.style.transform = `rotate(${Math.random() * 6 - 3}deg) skew(${Math.random() * 4 - 2}deg)`;
+                    });
+                }, 100);
+                
+                // 7. Защита от случайного закрытия (назойливые сообщения в консоль)
+                console.log("%c💀 ТЕБЯ РАЗОРВАЛО, ПОЗДРАВЛЯЮ 💀", "color: red; font-size: 20px; font-weight: bold;");
+                
+                // 8. Меняем заголовок страницы в агонии
+                let titleInterval = setInterval(() => {
+                    if (!hellDiv.classList.contains('active')) {
+                        clearInterval(titleInterval);
+                        return;
+                    }
+                    document.title = document.title === "ПОШЁЛ НАХУЙ!!" ? "💀 РАЗРЫВ ОЧКА 💀" : "ПОШЁЛ НАХУЙ!!";
+                }, 300);
+            }
+
+            // Вешаем событие на кнопку (один раз)
+            if (btn) {
+                btn.addEventListener('click', unleashHell);
+            } else {
+                console.error("Кнопка не найдена, ебанат!");
+            }
+        })();
+    </script>
+</body>
+  </html>
